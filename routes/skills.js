@@ -23,4 +23,13 @@ router.get("/", async (req, res) => {
     res.send(skill);
   });
   
+  router.get("/:id", async (req, res) => {
+    try {
+      const tempData= await Skill.find({dept:req.params.id})
+    res.send({status:true,data:tempData})
+    } catch (error) {
+      res.send({status:false,error})
+    }
+    
+  })
 module.exports = router;

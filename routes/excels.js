@@ -48,6 +48,14 @@ router.post("/addskill", async (req, res) => {
   
 });
 
+router.put("/updateUser/:userId",async (req, res) => {
+  try {
+    const user=await Excel.findByIdAndUpdate(req.params.userId,{...req.body},{new:true})
+    if(!user) return res.status(404).send("User not found")
+    res.send("User updated")  
+} catch (error) {
+  
+}})
 router.get("/", async (req, res) => {
   console.log("test");
   

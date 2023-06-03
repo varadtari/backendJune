@@ -31,6 +31,14 @@ const ExcelSchema = new mongoose.Schema({
     type: String,
     //required: true,
   },
+  readyForValidation: {
+    type: Boolean,
+    //required: true,
+  },
+  validated: {
+    type: Boolean,
+    //required: true,
+  },
   "Dept": {
     type: String,
    // required: true,
@@ -39,6 +47,12 @@ const ExcelSchema = new mongoose.Schema({
     type: String,
     //required: true,
   },
+
+  skills: {
+    type: [{level:Number,skill:String}],
+   // required: true,
+    
+},
   });
 
   const Excel=mongoose.model("Excel",ExcelSchema)
