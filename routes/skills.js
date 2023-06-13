@@ -17,10 +17,24 @@ router.get("/", async (req, res) => {
    // const { error } = validate(req.body); 
     // if (error) return res.status(400).send(error.details[0].message);
   
-    let skill = new Skill({...req.body});
-    skill = await skill.save();
+    const fileData=req.body.data;
+    try {
+      //const Excel=new ExcelModel({fileData:fileData});
+    Skill.insertMany(fileData,(err,data)=>{
+      if(err){
+          console.log(err);
+      }else{
+          console.log(data);
+      }
+  })
     
-    res.send(skill);
+    res.send("Inserted DATA");
+    } catch (error) {
+      res.send(error);
+    }
+  
+    
+  
   });
   
   router.get("/:id", async (req, res) => {

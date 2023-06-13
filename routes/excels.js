@@ -1,6 +1,9 @@
-const { Excel } = require("../models/excel");
+const { Excel, ExcelSchema } = require("../models/excel");
 const express = require("express");
+const { SkillSchema } = require("../models/skill");
 const router = express.Router();
+const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectId;
 
 router.post("/insert", async (req, res) => {
   //app.use(bodyParser.urlencoded({extended:false}));
@@ -112,5 +115,49 @@ router.get("/bydate", async (req, res) => {
   //   console.log("test1",genres)
   res.send(genres);
 });
+
+
+
+// router.delete("/deleteskill/:id", async (req, res) => {
+//   try {
+//     const id= req.params.id;
+//     const column=ExcelSchema.find()
+//     console.log("skilld",column);
+//           tempData=await Excel.deleteMany({_id:id});
+//   res.send({status:true,data:tempData})
+//   } catch (error) {
+//     res.send({status:false,error})
+//   }
+// })
+
+
+router.delete('/:rowId/:columnId', (req, res) => {
+  const rowId = req.params.rowId;
+  const columnId = req.params.columnId;
+    const collection = Excel;
+    collection.updateOne(
+      { _id: ObjectId(rowId) },
+      { $pull: { skills: { _id: ObjectId(columnId) } } },
+      (error, result) => {
+        if (error) {
+          console.error('Error deleting object from column', error);
+          res.status(500).json({ error: 'Failed to delete object from column' });
+        } else {
+          res.json({ message: 'Object deleted from column successfully' });
+        }
+
+        
+      }
+    );
+  });
+
+
+
+
+
+
+
+
+
 
 module.exports = router;

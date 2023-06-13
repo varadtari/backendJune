@@ -15,10 +15,7 @@ const SkillSchema = new mongoose.Schema({
     type: String,
    // required: true,
   },
-
-  
-  
-  });
+});
 
   const Skill=mongoose.model("Skill",SkillSchema)
   exports.SkillSchema=SkillSchema
