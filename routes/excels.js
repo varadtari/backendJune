@@ -131,7 +131,7 @@ router.get("/bydate", async (req, res) => {
 // })
 
 
-router.delete('/:rowId/:columnId', (req, res) => {
+router.delete('/deleteSkill/:rowId/:columnId', (req, res) => {
   const rowId = req.params.rowId;
   const columnId = req.params.columnId;
     const collection = Excel;
@@ -150,6 +150,37 @@ router.delete('/:rowId/:columnId', (req, res) => {
       }
     );
   });
+
+
+  router.delete('/api/excels/:userId/:skillIndex', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const skillIndex = parseInt(req.params.skillIndex);
+
+    // Fetch the user data from the database
+    const user = await Excel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if the skillIndex is valid
+    if (skillIndex < 0 || skillIndex >= user.skills.length) {
+      return res.status(400).json({ message: 'Invalid skill index' });
+    }
+
+    // Remove the skill at the specified index
+    user.skills.splice(skillIndex, 1);
+
+    // Save the updated user data
+    await user.save();
+
+    res.json({ message: 'Skill deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting skill:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 

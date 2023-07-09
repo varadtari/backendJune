@@ -1,20 +1,23 @@
 const mongoose=require("mongoose")
+const { Excel, ExcelSchema } = require("../models/excel");
 
 const SkillSchema = new mongoose.Schema({
     skill_name: {
       type: String,
-     // required: true,
-      unique: true,
+     required: true,
+      unique:true,
   },
   skill_level: {
-    type: [{level:Number,name:String}],
-   // required: true,
+    type: [{level:String,name:String}],
+   required: true,
     
 },
-  dept: {
-    type: String,
+  Dept: {
+     type:String,
+    ref: 'Excel'
    // required: true,
   },
+ 
 });
 
   const Skill=mongoose.model("Skill",SkillSchema)

@@ -39,7 +39,7 @@ const ExcelSchema = new mongoose.Schema({
     type: Boolean,
     //required: true,
   },
-  "Dept": {
+  Dept: {
     type: String,
    // required: true,
   },
@@ -49,8 +49,8 @@ const ExcelSchema = new mongoose.Schema({
   },
 
   skills: {
-    type: [{level:Number,skill:String}],
-   // required: true,
+    type: [{level:String,skill:String}],
+   required: true,
     
 },
   });
