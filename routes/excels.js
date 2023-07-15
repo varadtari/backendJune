@@ -271,10 +271,56 @@ router.post('/format', async (req, res) => {
  });
 
 
+//  router.get('/format', (req, res) => {
+//   // Retrieve the format number from the database
+//   Format.findOne({}, (err, format) => {
+//     if (err) {
+//       console.error(err);
+//       res.status(500).json({ error: 'Internal Server Error' });
+//     } else {
+//       res.json({ formatNumber: format ? format.FORMAT_NO : null });
+//     }
+//   });
+// });
+router.get('/format', (req, res) => {
+  // Retrieve the last format number from the database
+  Format.findOne({})
+    .sort({ _id: -1 }) // Sort by _id in descending order
+    .limit(1) // Limit the result to one document
+    .exec((err, format) => {
+      if (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        res.json({ formatNumber: format ? format.FORMAT_NO : null });
+      }
+    });
+});
 
+router.put("updateUser/:userid", async (req, res) => {
+  try {
+    const { userid } = req.params;
+    const { skills } = req.body;
 
+    // Find the user by ID
+    const user = await Excel.findByid(userid);
 
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
+    // Update the skills field of the user
+    user.skills = skills;
+
+    // Save the updated user to the database
+    await user.save();
+
+    return res.json({ message: "Skills updated successfully" });
+  } catch (error) {
+    console.error("Error updating skills:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
 
 
 
