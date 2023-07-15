@@ -31,7 +31,7 @@ const ExcelSchema = new mongoose.Schema({
     type: String,
     //required: true,
   },
-  readyForValidation: {
+  readyForValidationTemp: {
     type: Boolean,
     //required: true,
   },
@@ -47,12 +47,21 @@ const ExcelSchema = new mongoose.Schema({
     type: String,
     //required: true,
   },
-
+  TRAINER: {
+    type: String,
+    //required: true,
+  },
   skills: {
     type: [{level:String,skill:String}],
    required: true,
     
 },
+ hasCheckbox:{
+  type:Boolean
+ },
+
+
+
   });
 
   const Excel=mongoose.model("Excel",ExcelSchema)

@@ -1,9 +1,18 @@
 const { Excel, ExcelSchema } = require("../models/excel");
+const { Format, FormatSchema } = require("../models/format");
 const express = require("express");
 const { SkillSchema } = require("../models/skill");
 const router = express.Router();
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+
+
+
+
+
+
 
 router.post("/insert", async (req, res) => {
   //app.use(bodyParser.urlencoded({extended:false}));
@@ -80,6 +89,8 @@ router.get("/bydept", async (req, res) => {
   }
 });
 
+
+
 router.get("/filter", async (req, res) => {
   try {
     let temp = {};
@@ -90,7 +101,7 @@ router.get("/filter", async (req, res) => {
   
   if (query.fromDate && query.toDate) {
     temp.DateJoin = {
-      $gte: new Date(new Date(req.query.fromDate).setHours(00, 00, 00)),
+      $gte: new Date(new Date(req.query.fromDate).setHours(0o0, 0o0, 0o0)),
       $lt: new Date(new Date(req.query.toDate).setHours(23, 59, 59)),
     };
   }
@@ -103,12 +114,14 @@ router.get("/filter", async (req, res) => {
     res.send({status:false,error})
   }
   
-});
+}); 
+
+
 router.get("/bydate", async (req, res) => {
   console.log("test", req);
   const genres = await Excel.find({
     DateJoin: {
-      $gte: new Date(new Date(req.query.fromDate).setHours(00, 00, 00)),
+      $gte: new Date(new Date(req.query.fromDate).setHours(0o0, 0o0, 0o0)),
       $lt: new Date(new Date(req.query.toDate).setHours(23, 59, 59)),
     },
   });
@@ -137,7 +150,7 @@ router.delete('/deleteSkill/:rowId/:columnId', (req, res) => {
     const collection = Excel;
     collection.updateOne(
       { _id: ObjectId(rowId) },
-      { $pull: { skills: { _id: ObjectId(columnId) } } },
+      { $pull: { skills: { _id: ObjectId(columnId) } } }, 
       (error, result) => {
         if (error) {
           console.error('Error deleting object from column', error);
@@ -181,6 +194,81 @@ router.delete('/deleteSkill/:rowId/:columnId', (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+router.put("/check/:id", (req, res) => {
+  const id = req.params.id;
+  console.log("check",id);
+  console.log("body",req.body)
+  const { hasCheckbox } = req.body;
+
+  Excel.findByIdAndUpdate(
+    id,
+    { hasCheckbox },
+    { new: true },
+    (err, updatedData) => {
+      if (err) {
+        console.error("Error updating checkbox state:", err);
+        res.status(500).json({ error: "Failed to update checkbox state" });
+      } else {
+        console.log("Checkbox state updated successfully:", updatedData);
+        res.json(updatedData);
+      }
+    }
+  );
+})
+
+
+
+
+// router.put('/check/:id', (req, res) => {
+//   // Extract the id from the request parameters
+//   const id = req.params.id;
+
+//   // Extract the employeeSignatures data from the request body
+//   const { employeeSignatures } = req.body;
+
+//   // Perform the necessary operations to save the employeeSignatures data
+//   // to the database or perform any other relevant actions
+//   // Example: Assuming you have a MongoDB collection named "excels",
+//   // you can save the data as follows:
+//   Excel.findOneAndUpdate(
+//     { _id: id }, // Assuming you have a unique identifier field in your database documents
+//     { employeeSignatures },
+//     { new: true } // To return the updated document
+//   )
+//     .then((updatedDocument) => {
+//       // Return a success response with the updated document
+//       res.status(200).json(updatedDocument);
+//     })
+//     .catch((error) => {
+//       // Return an error response if any error occurs
+//       res.status(500).json({ error: 'An error occurred while saving the employee signatures.' });
+//     });
+// });
+
+router.post('/format', async (req, res) => {
+  // const { error } = validate(req.body); 
+   // if (error) return res.status(400).send(error.details[0].message);
+ 
+   const formatData=req.body.data;
+   try {
+     //const Excel=new ExcelModel({fileData:fileData});
+   Format.insertMany(formatData,(err,data)=>{
+     if(err){
+         console.log(err);
+     }else{
+         console.log(data);
+     }
+ })
+   
+   res.send("Inserted DATA");
+   } catch (error) {
+     res.send(error);
+   }
+ 
+   
+ 
+ });
 
 
 
