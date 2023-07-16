@@ -31,14 +31,7 @@ const ExcelSchema = new mongoose.Schema({
     type: String,
     //required: true,
   },
-  readyForValidationTemp: {
-    type: Boolean,
-    //required: true,
-  },
-  validated: {
-    type: Boolean,
-    //required: true,
-  },
+ 
   Dept: {
     type: String,
    // required: true,
@@ -52,14 +45,13 @@ const ExcelSchema = new mongoose.Schema({
     //required: true,
   },
   skills: {
-    type: [{level:String,skill:String}],
+    type: [{level:String,skill:String,approve:Boolean,approve2:Boolean}],
    required: true,
     
 },
  hasCheckbox:{
   type:Boolean
  },
-
 
 
   });
