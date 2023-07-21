@@ -62,6 +62,40 @@ router.post("/addskill", async (req, res) => {
 
 
 
+// router.delete("/delete/:id", async (req, res) => {
+//   const objectId = req.params.id;
+
+//   try {
+//     // Find the object by its _id and delete it
+//     const deletedObject = await Excel.findByIdAndDelete(objectId);
+
+//     if (!deletedObject) {
+//       return res.status(404).json({ message: "Object not found" });
+//     }
+
+//     return res.status(200).json({ message: "Object deleted successfully" });
+//   } catch (err) {
+//     return res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+router.delete("/delete", async (req, res) => {
+  const objectIds = req.body.ids; // Assuming you pass the array of IDs in the request body as "ids"
+
+  try {
+    // Find the objects by their _ids and delete them
+    const deletedObjects = await Excel.deleteMany({ _id: { $in: objectIds } });
+
+    if (!deletedObjects || deletedObjects.deletedCount === 0) {
+      return res.status(404).json({ message: "Objects not found" });
+    }
+
+    return res.status(200).json({ message: "Objects deleted successfully" });
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
 router.put("/updateUser4/:userId",async (req, res) => {
   try {
     const user=await Excel.findByIdAndUpdate(req.params.userId,{...req.body},{new:true})
@@ -321,6 +355,36 @@ router.put("updateUser/:userid", async (req, res) => {
   } catch (error) {
     console.error("Error updating skills:", error);
     return res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/", async (req, res) => {
+  try {
+    const excelData = await Excel.find(); // Fetch all Excel data from the database
+    res.json(excelData); // Return the fetched data as a JSON response
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching Excel data from the database." });
+  }
+});
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    // Use your ExcelModel to find and delete the row with the specified _id
+    await Excel.findByIdAndDelete(id);
+    res.status(200).json({ message: "Row deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting the row.", error: error.message });
+  }
+});
+router.get('/departments', async (req, res) => {
+  try {
+    // Fetch all unique departments from the Excel model
+    const departments = await Excel.distinct('Dept').exec();
+
+    res.json(departments);
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
