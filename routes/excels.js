@@ -387,6 +387,30 @@ router.get('/departments', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+router.put("/check", async (req, res) => {
+  try {
+    const { employeeSignatures } = req.body;
+
+    // Use bulkWrite to perform multiple updates in a single API call
+    const bulkOps = employeeSignatures.map(({ id, hasCheckbox }) => ({
+      updateOne: {
+        filter: { _id: id },
+        update: { hasCheckbox },
+      },
+    }));
+
+    // Perform bulk write operations to update the database
+    await Excel.bulkWrite(bulkOps);
+
+    return res.status(200).json({ success: true, message: "Checkbox state updated successfully." });
+  } catch (error) {
+    console.error("Error updating checkbox state:", error);
+    return res.status(500).json({ success: false, message: "An error occurred while updating checkbox state." });
+  }
+});
+
+
+
 
 
 
