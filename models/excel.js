@@ -52,9 +52,19 @@ const ExcelSchema = new mongoose.Schema({
  hasCheckbox:{
   type:Boolean
  },
+ createdAt: {
+  type: Date,
+  default: Date.now,
+},
 
 
-  });
+
+  },
+  {
+    timestamps: true, // Automatically manage createdAt and updatedAt fields
+  }
+  
+  );
 
   const Excel=mongoose.model("Excel",ExcelSchema)
   exports.ExcelSchema=ExcelSchema

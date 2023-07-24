@@ -15,26 +15,41 @@ const mongoose = require("mongoose");
 
 
 router.post("/insert", async (req, res) => {
-  //app.use(bodyParser.urlencoded({extended:false}));
-  const fileData=req.body.data; 
-  console.log("backend",fileData);
- // fileData=XLSX.utils.sheet_to_json(workbook.Sheets[sheet_namelist[x]]);
-  try {
-    //const Excel=new ExcelModel({fileData:fileData});
-  Excel.insertMany(fileData,(err,data)=>{
-    if(err){
-        console.log(err);
-    }else{
-        console.log(data);
-    }
-})
-  
-  res.send("Inserted DATA");
-  } catch (error) {
-    res.send(error);
-  }
+  const fileData = req.body.data;
 
-  
+  try {
+    // Create an array to store unique data
+    const uniqueData = [];
+
+    for (const rowData of fileData) {
+      // Check if the document with the same "EMP CODE" already exists in the database
+      const existingDocument = await Excel.findOne({ "EMP CODE": rowData["EMP CODE"] });
+
+      if (!existingDocument) {
+        // If the document does not exist, add it to the uniqueData array
+        uniqueData.push(rowData);
+      } else {
+        // If the document already exists, skip inserting it
+        console.log(`Skipping duplicate entry with EMP CODE: ${rowData["EMP CODE"]}`);
+      }
+    }
+
+    // Insert the unique data into the database using insertMany
+    Excel.insertMany (uniqueData,{ ordered: false }, async(err, data) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send("Error inserting data");
+      } else {
+        console.log(data);
+        const sortedData = await Excel.find({ _id: { $in: data.map(doc => doc._id) } }).sort({ createdAt: -1 }).exec();
+
+        res.send(sortedData);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal server error");
+  }
 });
 router.post("/addskill", async (req, res) => {
   
@@ -360,7 +375,7 @@ router.put("updateUser/:userid", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const excelData = await Excel.find(); // Fetch all Excel data from the database
+    const excelData = await Excel.find().sort({ _id: -1 }); // Fetch all Excel data from the database, sorted by _id in descending order
     res.json(excelData); // Return the fetched data as a JSON response
   } catch (error) {
     res.status(500).json({ message: "Error fetching Excel data from the database." });
